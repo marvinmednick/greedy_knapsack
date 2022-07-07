@@ -49,7 +49,8 @@ fn process_knapsack(file: &mut File) {
         let weight = caps["weight"].parse::<u64>().unwrap(); 
         k.add_vertex(value,weight);
     }
-    k.process();
+    let result = k.process();
+    println!("Max value is {}",result);
 }
 
 fn main() {
@@ -72,9 +73,7 @@ fn main() {
         Err(why) => panic!("couldn't open {}: {}", display, why),
         Ok(file) => file,
     };
-    info!("Starting process");
     process_knapsack(&mut file);
-    info!("Done with process");
 }
 
 

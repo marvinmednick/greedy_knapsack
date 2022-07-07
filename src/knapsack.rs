@@ -1,5 +1,5 @@
 use log::{ info, error, debug, trace };
-//use std::collections::HashMap;
+use std::collections::HashMap;
 //use std::collections::BTreeMap;
 use std::cmp::{min,max};
 use std::collections::HashSet;
@@ -19,6 +19,7 @@ impl VertexInfo {
 //#[derive(Debug)]
 pub struct KnapsackInfo {
     vertex_list: Vec::<VertexInfo>,
+    results: HashMap::<(usize,u64),u32>,
     knapsack_size : u64,
     min_value : u32,
     max_value : u32,
@@ -33,6 +34,7 @@ impl KnapsackInfo {
     pub fn new(size : u64) -> Self {
         KnapsackInfo {
             vertex_list : Vec::<VertexInfo>::new(),
+            results: HashMap::<(usize,u64),u32>::new(),
             knapsack_size : size,
             min_value : u32::MAX,
             max_value : 0,
@@ -54,10 +56,62 @@ impl KnapsackInfo {
         id
     }
 
-    pub fn process(&self) {
-        info!("{} Vertexes  Values ({} - {} Weights ({} - {} ))",self.vertex_list.len(),self.min_value,self.max_value, self.min_weight, self.max_weight);
-
+    pub fn process(&mut self) -> u32 {
+        info!("{} Vertexes  Values ({} - {} Weights ({} - {} ))",
+                self.vertex_list.len(),self.min_value,self.max_value, self.min_weight, self.max_weight);
+        let index = self.vertex_list.len()-1;
+        self.find_value(index,self.knapsack_size)
     }
+
+
+    pub fn find_value(&mut self, index : usize, size: u64)  -> u32 {
+
+        // the value of the current index with size of knapsack size is the larger or
+        // a) the value of  with vertex index-1 and the current size OR
+        // b) the value of  vertex index-cur weight + cur_weight
+
+
+        if let Some(value) = self.results.get(&(index,size)) {
+            debug!("Value of {},{} is {}",index,size,value);
+            return *value
+        }
+        else {
+            let vertex = self.vertex_list.get(index).unwrap(); 
+            let cur_vertex_value  = vertex.value.clone();
+            let cur_vertex_weight = vertex.weight.clone();
+
+            debug!("Searching for Value of {},{} - current v {} w {}",index,size,cur_vertex_value,cur_vertex_weight);
+            let value1 = {
+                if index > 0 {
+                    self.find_value(index-1,size)
+                }
+                else {
+                    0
+                }
+            };
+
+            let value2 = {
+                if index > 0 && size >= cur_vertex_weight {
+                    let prev = self.find_value(index-1,size-cur_vertex_weight);
+                    prev + cur_vertex_value
+                }
+                else {
+                    0
+                }
+
+            };
+            let value = max(value1,value2);
+            self.results.insert((index,size),value);
+            if self.results.len() % 100000 == 0 {
+                info!("Progress {} results at index {}",self.results.len(),index);
+            }
+            debug!("value1 {}, value2 {} -> {}",value1,value2,value);
+            debug!("Add index {}, size {} value {} to results",index,size,value);
+            value
+           
+        }
+    }
+
 
 }
 
@@ -95,7 +149,7 @@ mod tests {
         info!("Starting");
         debug!("Starting Debug");
         let mut k = setup_basic();
-        k.process();
+        assert_eq!(k.process(),50);
 
     }
 
