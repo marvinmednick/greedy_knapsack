@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::fs::File;
 
-use std::io::{prelude::*, BufReader,BufRead};
+use std::io::{BufReader,BufRead};
 use regex::Regex;
 //use std::io;
 
@@ -36,7 +36,7 @@ fn process_knapsack(file: &mut File) {
 	let mut _count = 0;
     for line in reader.lines() {
 		_count += 1;	
-		let mut line_data = line.unwrap();
+		let line_data = line.unwrap();
         debug!("Processing {} {}",_count, line_data);
         if _count % 50 == 0 {
             info!("Proccesed {}", _count);

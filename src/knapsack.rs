@@ -1,8 +1,8 @@
-use log::{ info, error, debug, trace };
+use log::{ info, /* error , */ debug, /* trace */ };
 use std::collections::HashMap;
 //use std::collections::BTreeMap;
 use std::cmp::{min,max};
-use std::collections::HashSet;
+//use std::collections::HashSet;
 
 
 pub struct VertexInfo {
@@ -96,7 +96,7 @@ impl KnapsackInfo {
                     prev + cur_vertex_value
                 }
                 else {
-                    0
+                    cur_vertex_value
                 }
 
             };
