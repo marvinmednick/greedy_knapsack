@@ -50,16 +50,14 @@ fn process_knapsack(file: &mut File) {
         k.add_vertex(value,weight);
     }
     let result = k.process();
-    println!("Max value is {}",result);
+    println!("{}",result);
 }
 
 fn main() {
 
     env_logger::init();
 
-    println!("Hello");
     let cmd_line = CommandArgs::new();
-    println!("Hello2");
 
     debug!("The Command Line, {:?}!",cmd_line);
 

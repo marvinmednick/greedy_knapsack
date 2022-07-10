@@ -6,7 +6,7 @@ import logging
 import os
 
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "ERROR"))
 log = logging.getLogger("knap")
 #log.setLevel(level)
 log.info("Info enabled")
@@ -24,7 +24,7 @@ line1_values = re.match("(?P<size>\d+)\s+(?P<num_vertex>\d+)",line1)
 knapsack_size = int(line1_values.group('size'))+1
 num_vertex = int(line1_values.group('num_vertex'))
 
-print(f"size {num_vertex} {knapsack_size}")
+log.info(f"size {num_vertex} {knapsack_size}")
 Lines = file1.readlines()
 
 vertex = []
@@ -40,7 +40,7 @@ for line in Lines:
 
 
 for v in vertex:
-    print(v)
+    log.debug(v)
 
 
 results = [[0 for i in range(num_vertex)] for w in range(knapsack_size)]
@@ -56,30 +56,32 @@ for i in range(0,num_vertex):
 
         if x >= 0 and i-1 >= 0:
             result1 = results[x][i-1] 
-            if not results_valid[x][i-1]: print(f"Result x{x} i-1{i-1} not yet set") 
+            if not results_valid[x][i-1]: log.critical(f"Result x{x} i-1{i-1} not yet set") 
         else:
             result1 = 0
-        if i > 0 and x >= vertex[i]['weight']:
-            x_index = x-vertex[i]['weight'] 
-            result2 = results[x_index][i-1]+vertex[i]['value']
-            if not results_valid[x_index][i-1]: print(f"Result  x-weight(i) {x_index} {i-1} not yet set")
+
+        if x >= vertex[i]['weight']:
+            x_index = x - vertex[i]['weight'] 
+            result2 = results[x_index][i-1]+vertex[i]['value'] if i > 0 else vertex[i]['value']
+            if i > 0 and not results_valid[x_index][i-1]: log.critical(f"Result  x-weight(i) {x_index} i {i-1} not yet set result={result2}")
         else:
-            result2 = vertex[i]['value']
+            result2 = 0 
+            
 
         log.debug(f"{i} {x} R1 {result1}, R2 {result2}")
         results[x][i] = max(result1,result2)
         results_valid[x][i] = True 
-    print(f"Result for i={i}")
+    log.debug(f"Result for i={i}")
     for j in reversed(range(0,knapsack_size)):
         loginfo = f"{j}",[f"{results[j][i]:.2f}" for i in range(num_vertex)]
         log.debug(loginfo)
 
 
-print("Final")
+#print("Final")
 #for j in reversed(range(0,knapsack_size)):
 #    print(f"{j}",[f"{results[j][i]:.2f}" for i in range(num_vertex)])
 
 
-print(f"Max Value is {results[knapsack_size-1][num_vertex-1]}")
+print(f"{results[knapsack_size-1][num_vertex-1]}")
 
 

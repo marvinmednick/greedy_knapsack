@@ -91,12 +91,15 @@ impl KnapsackInfo {
             };
 
             let value2 = {
-                if index > 0 && size >= cur_vertex_weight {
-                    let prev = self.find_value(index-1,size-cur_vertex_weight);
+                if size >= cur_vertex_weight {
+                    let mut prev = 0;
+                    if index > 0 {
+                        prev = self.find_value(index-1,size-cur_vertex_weight);
+                    }
                     prev + cur_vertex_value
                 }
                 else {
-                    cur_vertex_value
+                    0
                 }
 
             };
